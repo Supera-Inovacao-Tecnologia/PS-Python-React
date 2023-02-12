@@ -5,7 +5,10 @@ from .models import User
 from rest_framework.views import Request, Response, APIView, status
 from django.shortcuts import get_object_or_404
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
+from .permissions import UpdateAndDelete
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -14,16 +17,23 @@ class UserCreateView(generics.CreateAPIView):
 
 
 class UserRetriveView(generics.RetrieveAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, UpdateAndDelete]
+    
     queryset = User.objects.all()
     serializer_class = UserRetriveSerializer
    
 
 class UserUpdatedView(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, UpdateAndDelete]
     serializer_class = UserUpdateSerializer
     queryset = User.objects.all()
 
 
 class UserDeactiveView(generics.DestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, UpdateAndDelete]
     serializer_class = UserDeactiveSerializer
     queryset = User.objects.all()
 
