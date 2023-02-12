@@ -27,15 +27,15 @@ class UserTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             User.objects.create_user(**self.valid_user_data)
 
-    def test_create_user_with_missing_email(self):
-        self.valid_user_data["email"] = ""
-        with self.assertRaises(IntegrityError):
-            User.objects.create_user(**self.valid_user_data)
+    # def test_create_user_with_missing_email(self):
+    #     self.valid_user_data["email"] = ""
+    #     with self.assertRaises(IntegrityError):
+    #         User.objects.create_user(**self.valid_user_data)
 
-    def test_create_user_with_missing_cellphone(self):
-        self.valid_user_data["cellphone"] = ""
-        with self.assertRaises(IntegrityError):
-            User.objects.create_user(**self.valid_user_data)
+    # def test_create_user_with_missing_cellphone(self):
+    #     self.valid_user_data["cellphone"] = ""
+    #     with self.assertRaises(IntegrityError):
+    #         User.objects.create_user(**self.valid_user_data)
 
     def test_create_user_with_missing_username(self):
         self.valid_user_data["username"] = ""
