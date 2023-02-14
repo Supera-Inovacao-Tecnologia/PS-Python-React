@@ -14,7 +14,6 @@ import os
 from pathlib import Path
 
 import dotenv
-
 dotenv.load_dotenv()
 
 SECRET_KEY= os.getenv('SECRET_KEY')
@@ -60,7 +59,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = ['rest_framework', 'rest_framework.authtoken', 'drf_spectacular']
 
-MY_APPS = ['users', 'products', 'orders']
+MY_APPS = ['users', 'products', 'orders', 'cart']
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 

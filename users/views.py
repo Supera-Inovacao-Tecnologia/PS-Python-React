@@ -19,10 +19,9 @@ class UserCreateView(generics.CreateAPIView):
 class UserRetriveView(generics.RetrieveAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, UpdateAndDelete]
-    
     queryset = User.objects.all()
     serializer_class = UserRetriveSerializer
-   
+    
 
 class UserUpdatedView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
@@ -37,14 +36,12 @@ class UserDeactiveView(generics.DestroyAPIView):
     serializer_class = UserDeactiveSerializer
     queryset = User.objects.all()
 
-
+    
 class LoginView(APIView):
 
     def post(self, request: Request) -> Response:
         serializer = LoginSerializer(data=request.data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         user = authenticate(**serializer.validated_data)
-        if not user:
-            return Response({"detail": "invalid username or password"}, status.HTTP_400_BAD_REQUEST)
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key}, status.HTTP_200_OK)
