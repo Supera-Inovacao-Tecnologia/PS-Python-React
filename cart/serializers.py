@@ -3,16 +3,18 @@ from .models import Cart, CartProducts
 from products.models import Products
 from django.forms.models import model_to_dict
 
+
 class CartSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     products = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'products', 'createdAt', 'updatedAt',  'is_finished']
+        fields = ['id', 'user', 'products',
+                  'createdAt', 'updatedAt',  'is_finished']
 
     def get_products(self, instance):
-        cart = Cart.objects.get(user=instance.user)
+        cart = Cart.objects.get(user=self.context['request'].user)
         list_products = []
         products = CartProducts.objects.filter(cart=cart)
         for item in products:
@@ -22,25 +24,38 @@ class CartSerializer(serializers.ModelSerializer):
         return list_products
 
 
+class CartCleanSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'user',
+                  'createdAt', 'updatedAt',  'is_finished']
+
+    def get_extra_kwargs(self):
+        if self.context['request'].data['is_finished']:
+            cart = Cart.objects.get(user=self.context['request'].user)
+            CartProducts.objects.filter(cart=cart).delete()
+        return super().get_extra_kwargs()
+
+
 class CartProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartProducts
         fields = ['cart', 'product', 'quantity']
 
-    
     def get_extra_kwargs(self):
         cart = Cart.objects.get(user=self.context['request'].user)
-        product = Products.objects.get(id=self.context['request'].data['product_id'])
-        list_cart_product = CartProducts.objects.filter(cart=cart, product=product)
-        
+        product = Products.objects.get(
+            id=self.context['request'].data['product_id'])
+        list_cart_product = CartProducts.objects.filter(
+            cart=cart, product=product)
+
         if len(list_cart_product) > 0:
             CartProducts.objects.filter(product=product).delete()
-            quatity_updated = list_cart_product[0].quantity+self.context['request'].data['quantity']
-            self.context['request'].data['quantity'] = quatity_updated
+            # quatity_updated = list_cart_product[0].quantity + self.context['request'].data['quantity']
+            self.context['request'].data['quantity'] = self.context['request'].data['quantity']
 
         self.context['request'].data['cart'] = cart.id
         self.context['request'].data['product'] = product.id
-        
-        return super().get_extra_kwargs();
-
-  
+        return super().get_extra_kwargs()

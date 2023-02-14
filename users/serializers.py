@@ -35,29 +35,16 @@ class UserRetriveSerializer(serializers.ModelSerializer):
         new_cart['products'] = []
         products = CartProducts.objects.filter(cart=cart)
         for item in products:
-            new_cart['products'].append(model_to_dict(item))
-
+            product = model_to_dict(item)
+            product.pop('cart')
+            product['product'] = item.product.name
+            new_cart['products'].append(product)
         return new_cart
-
-    # def to_representation(self, instance):
-    #     cart = Cart.objects.get(user=instance)
-    #     new_cart = model_to_dict(cart)
-    #     new_cart['products'] = []
-    #     products = CartProducts.objects.filter(cart=cart)
-    #     for item in products:
-    #         new_cart['products'].append(model_to_dict(item))
-    #     user_dict = model_to_dict(instance)
-    #     user_dict['cart'] = new_cart
-
-    #     return {'username': 'User1', 'is_active': True,
-    #              'email': 'user1@mail.com', 'cellphone': '021992248141',  'cart': {'is_finished': False, 'products': new_cart['products'] }}
-
 
 class UserDeactiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['is_active']
-
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(write_only=True)

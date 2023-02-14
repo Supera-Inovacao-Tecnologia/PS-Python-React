@@ -1,31 +1,29 @@
 from rest_framework import generics
 from .models import Cart, CartProducts
-from .serializers import CartSerializer, CartProductsSerializer
-from products.models import Products
-from rest_framework.views import Response
-
+from .serializers import CartSerializer, CartCleanSerializer, CartProductsSerializer
+from .utils import SerializerByMethodMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-
 from users.permissions import UpdateAndDelete
 
 
-class CartListView(generics.ListAPIView):
+class CartCreateView(SerializerByMethodMixin, generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, UpdateAndDelete]
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
 
-
-
-class CartCreateView(generics.ListCreateAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, UpdateAndDelete]
     queryset = CartProducts.objects.all()
-    serializer_class = CartProductsSerializer
+    serializer_map = {
+        'GET': CartSerializer,
+        'POST': CartProductsSerializer,
+    }
 
 
-class CartRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class ProductCartRetrieveUpdateDestroyView(SerializerByMethodMixin, generics.RetrieveUpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, UpdateAndDelete]
     queryset = Cart.objects.all()
-    serializer_class = CartSerializer
-    
+    serializer_map = {
+        'GET': CartSerializer,
+        'PATCH': CartCleanSerializer
+
+    }
